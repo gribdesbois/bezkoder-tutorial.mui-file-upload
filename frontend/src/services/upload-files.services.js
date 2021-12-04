@@ -1,24 +1,22 @@
-import http from './../http-common'
+import http from '../http-common'
 
 class UploadFilesService {
-  upload(files, onUploadProgress) {
-    const token = sessionStorage.getItem('Auth Token')
-    let formData = new FormData()
+  upload = (file, onUploadProgress) => {
+    /* const token = sessionStorage.getItem('Auth Token') */
+    const formData = new FormData()
 
     formData.append('file', file)
 
-    return http.post('/images', formData, {
-      headers : {
-        'Content-Type' : 'multipart/form-data',
-        'Authorization' : `Bearer ${token}`
+    return http.post('/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        /* Authorization: `Bearer ${token}`, */
       },
       onUploadProgress,
     })
   }
 
-  getFiles() {
-    return http.get('files')
-  }
+  getFiles = () => http.get('files')
 }
 
 export default new UploadFilesService()

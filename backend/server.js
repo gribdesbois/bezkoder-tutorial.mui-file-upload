@@ -1,41 +1,21 @@
-const http = require('http')
-const app = require('./app')
+const cors = require("cors");
+const express = require("express");
+const app = express();
 
-const normalizePort = (val) => {
-  const port = parseInt(val, 10)
+global.__basedir = __dirname;
 
-  if (isNaN(port)) { return val }
-  if (port >= 0) { return port }
-  return false
-}
-const port = normalizePort(process.env.PORT || '3333')
-app.set('port', port)
+var corsOptions = {
+  origin: "http://localhost:8080"
+};
 
-const errorHandler = (error) => {
-  if (error.syscall !== 'listen') {
-    throw error
-  }
-  const address = server.address()
-  const bind = typeof address === 'string' ? `pipe ${address}` : `port: ${port}`
-  switch (error.code) {
-    case 'EACCES':
-      console.error(`${bind} requires elevated privileges.`)
-      process.exit(1)
-    case 'EADDRINUSE':
-      console.error(`${bind} is already in use.`)
-      process.exit(1)
-    default:
-      throw error
-  }
-}
+app.use(cors(corsOptions));
 
-const server = http.createServer(app)
+const initRoutes = require("./src/routes");
 
-server.on('error', errorHandler)
-server.on('listening', () => {
-  const address = server.address()
-  const bind = typeof address === 'string' ? `pipe ${address}` : `port ${port}`
-  console.log(`Listening on ${bind}`)
-})
+app.use(express.urlencoded({ extended: true }));
+initRoutes(app);
 
-server.listen(port)
+let port = 3333;
+app.listen(port, () => {
+  console.log(`Running at localhost:${port}`);
+});

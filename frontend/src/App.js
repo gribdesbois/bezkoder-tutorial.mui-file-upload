@@ -1,25 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import './App.css'
+import { Typography } from '@material-ui/core'
+
+import UploadFiles from './components/upload-files.component'
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <div className="mg20">
+        <Typography variant='h5'>bezkoder.com</Typography>
+        <Typography variant='h6'>Material UI File Upload</Typography>
+      </div>
+      <UploadFiles />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

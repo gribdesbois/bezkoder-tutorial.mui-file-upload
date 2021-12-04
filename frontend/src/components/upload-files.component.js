@@ -1,7 +1,9 @@
-import React, {Component } from "react";
+/* eslint-disable no-unused-vars */
+import React, { Component } from 'react';
+import {
+  LinearProgress, Box, Typography, Button, ListItem, withStyles,
+} from '@material-ui/core'
 import UploadService from '../services/upload-files.services'
-import { LinearProgress, Box, Typography, Button, ListItem, withStyles } from "@material-ui/core"
-import {  } from "@material-ui/core"
 
 const BorderLinearProgress = withStyles((theme) => ({
   root: {
@@ -13,13 +15,15 @@ const BorderLinearProgress = withStyles((theme) => ({
   },
   bar: {
     borderRadius: 5,
-    backgroundColor: '#1a90ff'
+    backgroundColor: '#1a90ff',
   },
 }))(LinearProgress)
 
 export default class UploadFiles extends Component {
   constructor(props) {
-    super (props)
+    super(props)
+    this.selectFile = this.selectFile.bind(this)
+    this.upload = this.upload.bind(this)
 
     this.state = {
       selectedFiles: undefined,
@@ -38,38 +42,39 @@ export default class UploadFiles extends Component {
   }
 
   upload() {
-    let currentFile = this.state.selectedFiles[0]
+    const currentFile = this.state.selectedFiles[0]
 
     this.setState({
       progress: 0,
-      currentFile: currentFile,
+      currentFile,
     })
 
     UploadService.upload(currentFile, (event) => {
       this.setState({
-        progress: Math.round((100 * event.loaded) / event.total)
+        progress: Math.round((100 * event.loaded) / event.total),
       })
     })
-    .then((response) => {
-      this.setState({
-        message: response.data.message,
-        isError: false
+      .then((response) => {
+        this.setState({
+          message: response.data.message,
+          isError: false,
+        })
+        return UploadService.getFiles()
       })
-      return UploadService.getFiles()
-    })
-    .then((files) => {
-      this.setState({
-        fileInfos: files.data,
+      .then((files) => {
+        this.setState({
+          fileInfos: files.data,
+        })
       })
-    })
-    .catch(() => {
-      this.setState({
-        progress: 0,
-        message: 'Could not upload the file!',
-        currentFile: undefined,
-        isError:true
+      .catch((err) => {
+        console.log(err)
+        this.setState({
+          progress: 0,
+          message: 'Could not upload the file!',
+          currentFile: undefined,
+          isError: true,
+        })
       })
-    })
 
     this.setState({
       selectedFiles: undefined,
@@ -79,7 +84,7 @@ export default class UploadFiles extends Component {
   componentDidMount() {
     UploadService.getFiles().then((response) => {
       this.setState({
-        fileInfos: response.data
+        fileInfos: response.data,
       })
     })
   }
@@ -91,7 +96,7 @@ export default class UploadFiles extends Component {
       progress,
       message,
       fileInfos,
-      isError
+      isError,
     } = this.state
 
     return (
@@ -102,16 +107,16 @@ export default class UploadFiles extends Component {
               <BorderLinearProgress variant='determinate' value={progress} />
             </Box>
             <Box minWidth={35}>
-              <Typography variant={body2} color='textSecondary'>{`${progress}%`}</Typography>
+              <Typography variant='body2' color='textSecondary'>{`${progress}%`}</Typography>
             </Box>
           </Box>
         )}
 
         <label htmlFor="btn-upload">
-          <input 
+          <input
             id='btn-upload'
             name='btn-upload'
-            style={{display: 'none'}}
+            style={{ display: 'none' }}
             type="file"
             onChange={this.selectFile}
           />
@@ -127,9 +132,34 @@ export default class UploadFiles extends Component {
           {selectedFiles && selectedFiles.length > 0 ? selectedFiles[0].name : null}
         </div>
         <Button
-        className='btn-upload'>
-
+        className='btn-upload'
+        color='primary'
+        variant='contained'
+        component='span'
+        disabled={!selectedFiles}
+        onClick={this.upload}
+        >
+          Upload
         </Button>
+
+        <Typography variant='subtitle2' className={`upload-message ${isError ? 'error' : ''}`}>
+          {message}
+        </Typography>
+        <Typography variant='h6' className='list-header'>
+          List of Files
+        </Typography>
+        <ul className='list-group'>
+          {fileInfos
+            && fileInfos.map((file, index) => (
+              <ListItem
+                divider
+                key={index}
+              >
+                <a href={file.url}>{file.name}</a>
+              </ListItem>
+            ))
+          }
+        </ul>
       </div>
     )
   }

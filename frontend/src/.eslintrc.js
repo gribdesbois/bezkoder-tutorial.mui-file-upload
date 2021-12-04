@@ -14,4 +14,5 @@ module.exports = {
     semi: 'off',
     'import/prefer-default-export': 'off',
   },
+
 };
